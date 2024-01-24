@@ -1,12 +1,27 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const router = express.Router();
 const user = require('../Models/user');
 const Role = require("../Models/roles");
+const authmiddleware = require("../middleware/auth.middleware");
+const router = express.Router();
+
+// Get All user 
+router.get("/all-users",authmiddleware, async (req,res) => {
+    try{
+        if(req.userData.role !== "admin"){
+            return res.status(200).json({message : "Forbidden Only admin can see the list of users"});
+        }
+        const Users = await user.find();
+        res.status(200).json({Users});
+
+    }catch(error){
+        res.status(500).json({ message: "Internal Server Error", error: error.message });
+    }
+})
 
 
 
-
+// Post api to insert the user 
 router.post("/adduser" , async (req,res) => {
     try{
         const{user_name, email_address , password , role_name} = req.body;
@@ -37,6 +52,7 @@ router.post("/adduser" , async (req,res) => {
     }
 });
 
+// Delete api to delete the user
 router.delete("/user-delete/:id", async (req , res)=>{
     try{
         const userid = req.params.id;
@@ -53,6 +69,7 @@ router.delete("/user-delete/:id", async (req , res)=>{
     }
 });
 
+// Update api to update the user
 router.put("/user-update/:id" , async (req,res) => {
     try{
         const userid =  req.params.id;
