@@ -7,6 +7,7 @@ import Home from '../../dashboard/Home'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 export default function DashboardComp() {
+  //const  [data,setData]=useState([])
     const [openSidebarToggle, setOpenSidebarToggle] = useState(false)
     const OpenSidebar = () => {
       setOpenSidebarToggle(!openSidebarToggle)
@@ -36,6 +37,15 @@ export default function DashboardComp() {
        
       }, []); // Empty dependency array ensures the effect runs once on component mount
     
+
+
+      // useEffect(()=>{
+      //   axios.get("http://localhost:5000/users/all-users")
+      //   .then((response)=>{
+      //       console.log(response)
+      //       setData(response.data)
+      //   })
+      //   },[])
    
 
   return (
