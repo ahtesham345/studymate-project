@@ -3,8 +3,22 @@ const bcrypt = require("bcryptjs");
 const router = express.Router();
 const user = require('../Models/user');
 const Role = require("../Models/roles");
+const authmiddleware = require("../middleware/auth.middleware");
 
 
+// Get All user 
+router.get("/all-users",authmiddleware, async (req,res) => {
+    try{
+        if(req.userData.role !== "admin"){
+            return res.status(200).json({message : "Forbidden Only admin can see the list of users"});
+        }
+        const Users = await user.find();
+        res.status(200).json({Users});
+
+    }catch(error){
+        res.status(500).json({ message: "Internal Server Error", error: error.message });
+    }
+})
 
 router.post("/adduser" , async (req,res) => {
     try{
