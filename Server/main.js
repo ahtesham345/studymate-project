@@ -7,7 +7,7 @@ const authmiddleware = require("./middleware/auth.middleware");
 const authroute = require("./routes/auth");
 const rolesroute = require("./routes/roles");
 const userroute = require("./routes/user");
-const calanderroute = require("./routes/calender");
+const grouproute = require("./routes/group");
 const cors = require('cors');
 
 const app = express();
@@ -27,10 +27,10 @@ app.use(express.json());
 
 // Route Prefix 
 app.use("/auth",authroute);
-app.use("/roles" , rolesroute);
-app.use("/users" , userroute);
-app.use("/calender", calanderroute);
-app.get("/auth/protected", authmiddleware, (req, res) => {
+app.use("/roles" ,  authmiddleware, adminmiddleware, rolesroute);
+app.use("/users" ,  authmiddleware, adminmiddleware, userroute);
+app.use("/group", authmiddleware, adminmiddleware, grouproute);
+app.get("/auth/role", authmiddleware, (req, res) => {
   try {
     const { role, id } = req.userData;    
     // Customize the response based on the user's role
