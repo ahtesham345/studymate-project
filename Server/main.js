@@ -8,6 +8,8 @@ const authroute = require("./routes/auth");
 const rolesroute = require("./routes/roles");
 const userroute = require("./routes/user");
 const grouproute = require("./routes/group");
+const taskgroup = require("./routes/task");
+const calandergroup = require("./routes/calender");
 const cors = require('cors');
 
 const app = express();
@@ -25,11 +27,13 @@ db.once("open" , ()=> console.log("Connected to Database"));
 // Middlewares
 app.use(express.json());
 
-// Route Prefix 
+// protected Route Prefix 
 app.use("/auth",authroute);
 app.use("/roles" ,  authmiddleware, adminmiddleware, rolesroute);
 app.use("/users" ,  authmiddleware, adminmiddleware, userroute);
 app.use("/group", authmiddleware, adminmiddleware, grouproute);
+app.use("/task", authmiddleware, adminmiddleware, taskgroup);
+app.use("/calender", authmiddleware, adminmiddleware, calandergroup);
 app.get("/auth/role", authmiddleware, (req, res) => {
   try {
     const { role, id } = req.userData;    
