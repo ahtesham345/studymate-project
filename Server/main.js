@@ -10,6 +10,9 @@ const userroute = require("./routes/user");
 const grouproute = require("./routes/group");
 const taskgroup = require("./routes/task");
 const calandergroup = require("./routes/calender");
+const assesmentroute = require("./routes/assesment");
+const sessionroute = require("./routes/session");
+const graderoute = require("./routes/grade");
 const cors = require('cors');
 
 const app = express();
@@ -34,6 +37,9 @@ app.use("/users" ,  authmiddleware, adminmiddleware, userroute);
 app.use("/group", authmiddleware, adminmiddleware, grouproute);
 app.use("/task", authmiddleware, adminmiddleware, taskgroup);
 app.use("/calender", authmiddleware, adminmiddleware, calandergroup);
+app.use("/assesment", authmiddleware, adminmiddleware, assesmentroute);
+app.use("/session", authmiddleware, adminmiddleware, sessionroute);
+app.use("/grade", authmiddleware, adminmiddleware, graderoute);
 app.get("/auth/role", authmiddleware, (req, res) => {
   try {
     const { role, id } = req.userData;    
