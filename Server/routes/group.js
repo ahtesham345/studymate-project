@@ -67,7 +67,7 @@ router.put("/group-update/:id" , async(req,res) => {
 // Get all groups route
 router.get("/get-all-groups", async (req, res) => {
     try {
-        const allGroups = await group.find();
+        const allGroups = await group.find().populate('user_id','user_name');
         res.status(200).json(allGroups);
     } catch (error) {
         console.log(error);
