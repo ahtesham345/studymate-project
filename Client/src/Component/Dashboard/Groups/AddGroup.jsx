@@ -5,11 +5,15 @@ import axios from "axios";
 import Header from "../../../partials/Header";
 import Sidebar from "../../../partials/Sidebar";
 
-function EditGroup() {
+function AddGroup() {
   const { userId } = useParams();
-  const [userData, setUserData] = useState([]);
-  const [users, setUsers] = useState([]); // Update here
+  const [userData, setUserData] = useState({
+    group_name: "",
+    user_id: "",
+  });
+  const [users, setUsers] = useState([]);
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -19,20 +23,14 @@ function EditGroup() {
             Authorization: `Bearer ${token}`,
           },
         };
-
-        const response = await axios.get(
-          `http://localhost:5000/group/get-group/${userId}`,
-          config
-        );
         const usersResponse = await axios.get(
           "http://localhost:5000/users/all-users",
           config
         );
 
-        setUserData(response.data);
         setUsers(usersResponse.data.Users);
       } catch (error) {
-        console.error("Error fetching user data for editing:", error);
+        console.error("Error fetching user data:", error);
       }
     };
 
@@ -47,29 +45,33 @@ function EditGroup() {
     }));
   };
 
-    const handleSubmit = async (e) => {
-      e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-      try {
-        const token = sessionStorage.getItem('token');
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        };
+    try {
+      const token = sessionStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
 
-        await axios.put(`http://localhost:5000/group/group-update/${userId}`, userData, config);
+      await axios.post(
+        "http://localhost:5000/group/assign-group",
+        userData,
+        config
+      );
 
-        // Redirect or perform any other actions after successful update
-        setTimeout(() => {
-          navigate('/Dashboard');
-        }, 2000);
-      } catch (error) {
-        console.error('Error updating group:', error);
-      }
-    };
+      // Redirect or perform any other actions after successful update
+      setTimeout(() => {
+        navigate("/Dashboard");
+      }, 2000);
+    } catch (error) {
+      console.error("Error adding group:", error);
+    }
+  };
 
-  if (!userData || !users) {
+  if (!users) {
     return <div>Loading...</div>;
   }
 
@@ -87,8 +89,8 @@ function EditGroup() {
           {/* Your main content goes here */}
           <div className="ml-4 mt-2">
             {/* Content of the dashboard */}
-            <h1 className="text-2xl font-semibold text-gray-400 ">
-              Edit Student
+            <h1 className="text-2xl font-semibold text-gray-400">
+              Add Session
             </h1>
 
             <form className="max-w-sm mx-auto" onSubmit={handleSubmit}>
@@ -102,7 +104,7 @@ function EditGroup() {
                   value={userData.group_name}
                   onChange={handleChange}
                   className="focus:outline-none shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                  placeholder="Enter a name "
+                  placeholder="Enter a name"
                   required
                 />
               </div>
@@ -125,11 +127,11 @@ function EditGroup() {
                   ))}
                 </select>
               </div>
-              <div className=" my-4">
-          <button className=" bg-blue-500 text-white  font-bold py-2 px-4 rounded-md">
-            Update Group
-          </button>
-        </div>
+              <div className="my-4">
+                <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded-md">
+                  Add Group
+                </button>
+              </div>
             </form>
             {/* Other components and content */}
           </div>
@@ -139,4 +141,4 @@ function EditGroup() {
   );
 }
 
-export default EditGroup;
+export default AddGroup;

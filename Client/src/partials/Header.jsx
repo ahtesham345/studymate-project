@@ -32,15 +32,14 @@ const Navbar = () => {
         {/* Logout dropdown */}
         {isDropdownOpen && (
           <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-md">
-            <ul>
+            <ul className=''>
               <li>
                 <button
                   type="button"
-                  className="block px-4 text-gray-700 hover:bg-gray-200 w-full text-left"
+                  className="block px-4 text-gray-700  w-full text-left"
                   onClick={handleLogout}
                 >
-                  <FaSignOutAlt className=" items-center" />
-                  Logout
+                  <FaSignOutAlt className=" items-center" />Logout
                 </button>
               </li>
               {/* Add more dropdown items as needed */}
