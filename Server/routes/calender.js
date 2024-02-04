@@ -32,7 +32,7 @@ router.post("/add-event" , async (req , res) => {
 // route to get all calenders events
 router.get('/all-events',async (req,res) => {
     try{
-        const calanders = await Calender.find();
+        const calanders = await Calender.find().populate('user_id','user_name');
         res.status(200).json(calanders);
     }
     catch(error){

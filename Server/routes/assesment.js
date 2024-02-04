@@ -32,7 +32,7 @@ router.post("/add-assesment", async (req,res) => {
 router.get('/all-assesments', async (req,res) => {
     try{
 
-    const assesment_data = await Assesment.find();
+    const assesment_data = await Assesment.find().populate('user_id','user_name');
     res.status(200).json(assesment_data);
     }
     catch(error)

@@ -34,7 +34,7 @@ router.post("/add-grade", async (req,res) => {
 router.get('/all-grades', async (req,res) => {
     try{
 
-    const grade_data = await Grade.find();
+    const grade_data = await Grade.find().populate('user_id','user_name');
     res.status(200).json(grade_data);
     }
     catch(error)
