@@ -1,13 +1,12 @@
-import Header from "../../../partials/Header";
 import Sidebar from "../../../partials/Sidebar";
+import Header from "../../../partials/Header";
 import { useState,useEffect } from 'react';
 import { Link } from "react-router-dom";
 import axios from 'axios';
 
 
-function Group() {
-    const [ data,setData] = useState([]);
-// Fetch user data from the API
+function Sessions() {
+const [data,setData] = useState([]);
 const fetchUserData = async () => {
     try {
       const token = sessionStorage.getItem("token");
@@ -19,37 +18,32 @@ const fetchUserData = async () => {
 
       // Make a GET request to the API endpoint
       const response = await axios.get(
-        `http://localhost:5000/group/get-all-groups`,
+        `http://localhost:5000/session/all-sessions`,
         config
       );
       
 
       // Set the fetched user data to the state
-      //const userData = response.data.Users;
       setData(response.data);
 
     } catch (error) {
-      // Handle any errors that occur during the request
       console.error("Error fetching user data:", error);
     }
   };
-
   useEffect(() => {
     // Fetch user data when the component mounts or when it returns to the page
     fetchUserData();
-  }, []); // Empty dependency array ensures the effect runs only once when the component mounts or when it returns
+  }, []) 
 
 
-  const handleEditUser = (userId) => {
+  const HandleEditSession = (userId) => {
     // Navigate to the Update page with userId as URL parameter
-      window.location.href = `/EditGroup/${userId}`;
+      window.location.href = `/EditSession/${userId}`;
   };
 
 
 
-
-
-  const handleDeleteUser = async (userId) => {
+  const HandleDeleteSession = async (userId) => {
     try {
       const token = sessionStorage.getItem("token");
       const config = {
@@ -60,7 +54,7 @@ const fetchUserData = async () => {
 
       // Make a DELETE request to the API endpoint to delete the user
       await axios.delete(
-        `http://localhost:5000/group/group-delete/${userId}`,
+        `http://localhost:5000/session/delete-session/${userId}`,
         config
       );
 
@@ -75,6 +69,7 @@ const fetchUserData = async () => {
    
     }
   };
+
 
 
   return (
@@ -93,7 +88,7 @@ const fetchUserData = async () => {
           {/* Content of the dashboard */}
           <div className="w-full flex justify-end mr-32 my-3">
           <button className=" bg-blue-500  font-bold py-2 px-4 rounded-md">
-            <Link to="/AddGroup" className="text-white no-underline">Add Group</Link>
+            <Link to="/AddSession" className="text-white no-underline">Add Session</Link>
           </button>
         </div>
           <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-2">
@@ -101,10 +96,22 @@ const fetchUserData = async () => {
              <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                  <tr>
                      <th scope="col" class="px-6 py-3">
-                         Group name
+                         Session-Name
                      </th>
                      <th scope="col" class="px-6 py-3">
-                         User Name
+                         Start-Time 
+                     </th>
+                     <th scope="col" class="px-6 py-3">
+                         End-Time 
+                     </th>
+                     <th scope="col" class="px-6 py-3">
+                         Progress 
+                     </th>
+                     <th scope="col" class="px-6 py-3">
+                         Materials 
+                     </th>
+                     <th scope="col" class="px-6 py-3">
+                         Student-Name  
                      </th>
                      <th scope="col" class="px-6 py-3">
                          Action
@@ -117,14 +124,26 @@ const fetchUserData = async () => {
                   return(
                  <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                      <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                         {item.group_name}
+                         {item.session_name}
+                     </td>
+                     <td class="px-6 py-4">
+                     {item.start_time}
+                     </td>
+                     <td class="px-6 py-4">
+                     {item.end_time}
+                     </td>
+                     <td class="px-6 py-4">
+                     {item.progress}
+                     </td>
+                     <td class="px-6 py-4">
+                     {item.materials}
                      </td>
                      <td class="px-6 py-4">
                      {item.user_id.user_name}
                      </td>
-                     <td class="px-6 py-4 space-x-2">
-                         <button  className="font-medium text-blue-600 dark:text-blue-500 no-underline  hover:no-underline" onClick={ () => handleEditUser(item._id)} >Edit</button>
-                         <button  className="font-medium text-red-600 no-underline hover:text-red-600 hover:no-underline" onClick={ () => handleDeleteUser(item._id)}>Delete</button>
+                     <td class=" pl-16 space-x-2 py-4">
+                         <button  className="font-medium text-blue-600 dark:text-blue-500 no-underline  hover:no-underline" onClick={() =>HandleEditSession(item._id)}>Edit</button>
+                         <button  className="font-medium text-red-600 no-underline hover:text-red-600 hover:no-underline" onClick={() =>HandleDeleteSession(item._id)}>Delete</button>
                      </td>
                  </tr>
                      )
@@ -141,4 +160,4 @@ const fetchUserData = async () => {
   )
 }
 
-export default Group
+export default Sessions

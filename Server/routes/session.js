@@ -35,7 +35,7 @@ router.post("/add-session", async (req,res) => {
 router.get('/all-sessions', async (req,res) => {
     try{
 
-    const session_data = await Session.find();
+    const session_data = await Session.find().populate('user_id','user_name');
     res.status(200).json(session_data);
     }
     catch(error)
