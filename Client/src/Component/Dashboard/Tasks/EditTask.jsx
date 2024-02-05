@@ -1,14 +1,14 @@
-import React from "react";
-import Header from "../../../partials/Header";
-import Sidebar from "../../../partials/Sidebar";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
-function EditStudent() {
+import Header from "../../../partials/Header";
+import Sidebar from "../../../partials/Sidebar";
+function EditTask() {
   const { userId } = useParams();
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [groups, setGroups] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
     const fetchUserData = async () => {
@@ -19,12 +19,22 @@ function EditStudent() {
             Authorization: `Bearer ${token}`,
           },
         };
+
         const response = await axios.get(
-          `http://localhost:5000/users/get-user/${userId}`,
+          `http://localhost:5000/task/get-task/${userId}`,
           config
         );
-
+        const usersResponse = await axios.get(
+          "http://localhost:5000/users/all-users",
+          config
+        );
+        const groupresponse = await axios.get(
+          "http://localhost:5000/group/get-all-groups",
+          config
+        );
         setUserData(response.data);
+        setUsers(usersResponse.data.Users);
+        setGroups(groupresponse.data);
       } catch (error) {
         console.error("Error fetching user data for editing:", error);
       }
@@ -53,25 +63,26 @@ function EditStudent() {
       };
 
       await axios.put(
-        `http://localhost:5000/users/user-update/${userId}`,
+        `http://localhost:5000/task/update-task/${userId}`,
         userData,
         config
       );
-      //   toast.success("Field Updated Successfully !");
 
+      // Redirect or perform any other actions after successful update
       setTimeout(() => {
         navigate("/Dashboard");
       }, 2000);
-
-      //       //console.log("User updated successfully!");
     } catch (error) {
-      console.error("Error updating user:", error);
+      console.error("Error updating task:", error);
     }
   };
 
-  if (!userData) {
+  if (!userData || !users) {
     return <div>Loading...</div>;
   }
+
+  console.log(userData);
+
   return (
     <div className="flex h-screen bg-gray-200">
       {/* Sidebar component */}
@@ -86,19 +97,17 @@ function EditStudent() {
           {/* Your main content goes here */}
           <div className="ml-4 mt-2">
             {/* Content of the dashboard */}
-            <h1 className="text-2xl font-semibold text-gray-400 ">
-              Edit Student
-            </h1>
+            <h1 className="text-2xl font-semibold text-gray-400 ">Edit Task</h1>
 
             <form className="max-w-sm mx-auto" onSubmit={handleSubmit}>
               <div className="mb-2">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Name
+                  Task Name
                 </label>
                 <input
                   type="text"
-                  name="user_name"
-                  value={userData.user_name}
+                  name="task_name"
+                  value={userData.task_name}
                   onChange={handleChange}
                   className="focus:outline-none shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
                   placeholder="Enter a name "
@@ -107,52 +116,76 @@ function EditStudent() {
               </div>
               <div className="mb-2">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  name="email_address"
-                  value={userData.email_address}
-                  onChange={handleChange}
-                  placeholder="Enter Email"
-                  className="focus:outline-none shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                  required
-                />
-              </div>
-              <div className="mb-2">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Password
-                </label>
-                <input
-                  type="text"
-                  name="passowrd"
-                  value={userData.password}
-                  onChange={handleChange}
-                  placeholder="Enter Password"
-                  id="repeat-password"
-                  className="focus:outline-none shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                  required
-                />
-              </div>
-              <div className="mb-2">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Role
+                  Priorty
                 </label>
                 <select
                   type="text"
-                  name="role"
-                  value={userData.role}
+                  name="priority"
+                  value={userData.priority}
                   onChange={handleChange}
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
                 >
                   <option value="">Select Role</option>
-                  <option value="Admin">Admin</option>
-                  <option value="student">student</option>
+                  <option value="First">First</option>
+                  <option value="Second">Second</option>
+                </select>
+              </div>
+              <div className="mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Deadline
+                </label>
+                <input
+                  type="text"
+                  name="deadline"
+                  value={userData.deadline}
+                  onChange={handleChange}
+                  className="focus:outline-none shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                  placeholder="Enter a name "
+                  required
+                />
+              </div>
+
+              <div className="mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Select User
+                </label>
+                <select
+                  name="user_id"
+                  value={userData.user_id}
+                  onChange={handleChange}
+                  className="focus:outline-none shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                  required
+                >
+                  <option value="">Select User</option>
+                  {users.map((user) => (
+                    <option key={user._id} value={user._id}>
+                      {user.user_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Select User
+                </label>
+                <select
+                  name="group_id"
+                  value={userData.group_id}
+                  onChange={handleChange}
+                  className="focus:outline-none shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                  required
+                >
+                  <option value="">Select Group</option>
+                  {groups.map((group) => (
+                    <option key={group._id} value={group._id}>
+                      {group.group_name}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div className=" my-4">
                 <button className=" bg-blue-500 text-white  font-bold py-2 px-4 rounded-md">
-                  Update Student
+                  Update Task
                 </button>
               </div>
             </form>
@@ -164,4 +197,4 @@ function EditStudent() {
   );
 }
 
-export default EditStudent;
+export default EditTask;

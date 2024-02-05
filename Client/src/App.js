@@ -19,6 +19,9 @@ import EditAssesment from './Component/Dashboard/Assesments/EditAssesment';
 import Grades  from './Component/Dashboard/Grades/Grades';
 import AddGrade from './Component/Dashboard/Grades/AddGrade';
 import EditGrade from './Component/Dashboard/Grades/EditGrade';
+import Tasks from './Component/Dashboard/Tasks/Tasks'
+import EditTask from './Component/Dashboard/Tasks/EditTask'
+import AddTask from './Component/Dashboard/Tasks/AddTask';
 
 
 function App() {
@@ -46,6 +49,10 @@ function App() {
        <Route path='/Grades' element={<Grades/>}/>
        <Route path='/AddGrade' element={<AddGrade/>}/>
        <Route path='/EditGrade/:userId' element={<EditGrade/>}/>
+       <Route path='/Tasks' element={<Tasks/>}/>
+       <Route path='/EditTask/:userId' element={<EditTask/>}/>
+       <Route path='/AddTask' element={<AddTask/>}/>
+       
 
            </Routes>
            </BrowserRouter>

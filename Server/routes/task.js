@@ -43,7 +43,7 @@ router.post("/add-task" , async(req,res) => {
 router.get("/all-task", async (req,res) => {
 
     try{
-        const alltask = await Task.find();
+        const alltask = await Task.find().populate('user_id','user_name').populate('group_id','group_name');
         res.status(200).json(alltask);
 
     }
