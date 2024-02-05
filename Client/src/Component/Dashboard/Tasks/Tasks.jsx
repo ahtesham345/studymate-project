@@ -1,11 +1,12 @@
-import Sidebar from "../../../partials/Sidebar";
 import Header from "../../../partials/Header";
+import Sidebar from "../../../partials/Sidebar";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-function Sessions() {
+function Tasks() {
   const [data, setData] = useState([]);
+  // Fetch user data from the API
   const fetchUserData = async () => {
     try {
       const token = sessionStorage.getItem("token");
@@ -17,27 +18,31 @@ function Sessions() {
 
       // Make a GET request to the API endpoint
       const response = await axios.get(
-        `http://localhost:5000/session/all-sessions`,
+        `http://localhost:5000/task/all-task`,
         config
       );
 
       // Set the fetched user data to the state
+      //const userData = response.data.Users;
       setData(response.data);
     } catch (error) {
+      // Handle any errors that occur during the request
       console.error("Error fetching user data:", error);
     }
   };
+
   useEffect(() => {
     // Fetch user data when the component mounts or when it returns to the page
     fetchUserData();
-  }, []);
+  }, []); // Empty dependency array ensures the effect runs only once when the component mounts or when it returns
 
-  const HandleEditSession = (userId) => {
-    // Navigate to the Update page with userId as URL parameter
-    window.location.href = `/EditSession/${userId}`;
-  };
+  //  // Function to format date string to date object
+  //  const formatDate = (dateString) => {
+  //   const date = new Date(dateString);
+  //   return date.toLocaleDateString(); // Format date as per user's locale
+  // };
 
-  const HandleDeleteSession = async (userId) => {
+  const handleDeleteUser = async (userId) => {
     try {
       const token = sessionStorage.getItem("token");
       const config = {
@@ -48,7 +53,7 @@ function Sessions() {
 
       // Make a DELETE request to the API endpoint to delete the user
       await axios.delete(
-        `http://localhost:5000/session/delete-session/${userId}`,
+        `http://localhost:5000/task/delete-task/${userId}`,
         config
       );
 
@@ -60,6 +65,10 @@ function Sessions() {
     } catch (error) {
       console.error("Error deleting user:", error);
     }
+  };
+  const handleEditUser = (userId) => {
+    // Navigate to the Update page with userId as URL parameter
+    window.location.href = `/EditTask/${userId}`;
   };
 
   return (
@@ -78,8 +87,8 @@ function Sessions() {
             {/* Content of the dashboard */}
             <div className="w-full flex justify-end mr-32 my-3">
               <button className=" bg-blue-500  font-bold py-2 px-4 rounded-md">
-                <Link to="/AddSession" className="text-white no-underline">
-                  Add Session
+                <Link to="/AddTask" className="text-white no-underline">
+                  Add Task
                 </Link>
               </button>
             </div>
@@ -88,23 +97,24 @@ function Sessions() {
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
                     <th scope="col" class="px-6 py-3">
-                      Session-Name
+                      Task name
                     </th>
                     <th scope="col" class="px-6 py-3">
-                      Start-Time
+                      Priority
                     </th>
                     <th scope="col" class="px-6 py-3">
-                      End-Time
+                      Deadline
                     </th>
                     <th scope="col" class="px-6 py-3">
-                      Progress
+                      Status
                     </th>
                     <th scope="col" class="px-6 py-3">
-                      Materials
+                      User Name
                     </th>
                     <th scope="col" class="px-6 py-3">
-                      Student-Name
+                      Group Name
                     </th>
+
                     <th scope="col" class="px-6 py-3">
                       Action
                     </th>
@@ -112,29 +122,30 @@ function Sessions() {
                 </thead>
                 <tbody>
                   {data.map((item) => {
+                    console.log(item.user_id.user_name);
                     return (
                       <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                         <td
                           scope="row"
                           class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                         >
-                          {item.session_name}
+                          {item.task_name}
                         </td>
-                        <td class="px-6 py-4">{item.start_time}</td>
-                        <td class="px-6 py-4">{item.end_time}</td>
-                        <td class="px-6 py-4">{item.progress}</td>
-                        <td class="px-6 py-4">{item.materials}</td>
+                        <td class="px-6 py-4">{item.priority}</td>
+                        <td class="px-6 py-4">{item.deadline}</td>
+                        <td class="px-6 py-4">{item.status}</td>
                         <td class="px-6 py-4">{item.user_id.user_name}</td>
-                        <td class=" pl-16 space-x-2 py-4">
+                        <td class="px-6 py-4">{item.group_id.group_name}</td>
+                        <td class="px-4 py-4 space-x-2">
                           <button
                             className="font-medium text-blue-600 dark:text-blue-500 no-underline  hover:no-underline"
-                            onClick={() => HandleEditSession(item._id)}
+                            onClick={() => handleEditUser(item._id)}
                           >
                             Edit
                           </button>
                           <button
                             className="font-medium text-red-600 no-underline hover:text-red-600 hover:no-underline"
-                            onClick={() => HandleDeleteSession(item._id)}
+                            onClick={() => handleDeleteUser(item._id)}
                           >
                             Delete
                           </button>
@@ -153,4 +164,4 @@ function Sessions() {
   );
 }
 
-export default Sessions;
+export default Tasks;

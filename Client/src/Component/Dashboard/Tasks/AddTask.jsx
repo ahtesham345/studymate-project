@@ -1,20 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 import Header from "../../../partials/Header";
 import Sidebar from "../../../partials/Sidebar";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-function AddSession() {
+function AddTask() {
   const [userData, setUserData] = useState({
-    session_name: "",
-    stat_time: "",
-    end_time: "",
-    progress: "",
-    materials: "",
+    task_name: "",
+    priority: "",
+    deadline: "",
     user_id: "",
+    group_id: "",
   });
-  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -24,30 +25,28 @@ function AddSession() {
             Authorization: `Bearer ${token}`,
           },
         };
+
         const usersResponse = await axios.get(
           "http://localhost:5000/users/all-users",
           config
         );
+        const groupresponse = await axios.get(
+          "http://localhost:5000/group/get-all-groups",
+          config
+        );
 
         setUsers(usersResponse.data.Users);
+        setGroups(groupresponse.data);
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.error("Error fetching user data for editing:", error);
       }
     };
 
     fetchUserData();
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUserData((prevUserData) => ({
-      ...prevUserData,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     try {
       const token = sessionStorage.getItem("token");
@@ -57,24 +56,31 @@ function AddSession() {
         },
       };
 
-      await axios.post(
-        "http://localhost:5000/session/add-session",
-        userData,
+      // Concatenate user_name and group_name before submitting
+      const user = users.find((user) => user._id === userData.user_id);
+      const group = groups.find((group) => group._id === userData.group_id);
+      const userGroupName = `${user.user_name} - ${group.group_name}`;
+
+      const dataToSend = {
+        ...userData,
+        user_name: userGroupName,
+      };
+
+      const response = await axios.post(
+        "http://localhost:5000/task/add-task",
+        dataToSend,
         config
       );
-
-      // Redirect or perform any other actions after successful update
-      setTimeout(() => {
-        navigate("/Dashboard");
-      }, 2000);
+      console.log("User added successfully:", response.data);
+      navigate("/Dashboard");
     } catch (error) {
-      console.error("Error adding group:", error);
+      console.error(
+        "Error adding user:",
+        error.response ? error.response.data : error.message
+      );
     }
   };
 
-  if (!users && !userData) {
-    return <div>Loading...</div>;
-  }
   return (
     <div className="flex h-screen bg-gray-200">
       {/* Sidebar component */}
@@ -89,79 +95,58 @@ function AddSession() {
           {/* Your main content goes here */}
           <div className="ml-4 mt-2">
             {/* Content of the dashboard */}
-            <h1 className="text-2xl font-semibold text-gray-400">Add Group</h1>
+            <h1 className="text-2xl font-semibold text-gray-400 ">Add Task</h1>
 
             <form className="max-w-sm mx-auto" onSubmit={handleSubmit}>
               <div className="mb-2">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Session Name
+                  Task Name
                 </label>
                 <input
                   type="text"
-                  name="session_name"
-                  value={userData.session_name}
-                  onChange={handleChange}
+                  name="task_name"
+                  value={userData.task_name}
+                  onChange={(e) =>
+                    setUserData({ ...userData, task_name: e.target.value })
+                  }
                   className="focus:outline-none shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                  placeholder="Enter a name"
+                  placeholder="Enter a name "
                   required
                 />
               </div>
               <div className="mb-2">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Start Time
+                  Priority
                 </label>
-                <input
-                  type="text"
-                  name="start_time"
-                  value={userData.start_time}
-                  onChange={handleChange}
-                  className="focus:outline-none shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                  placeholder="Enter a name"
-                  required
-                />
+                <select
+                  value={userData.priority}
+                  onChange={(e) =>
+                    setUserData({ ...userData, priority: e.target.value })
+                  }
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                >
+                  <option value="">Select Priority</option>
+                  <option value="First">First</option>
+                  <option value="Second">Second</option>
+                </select>
               </div>
+
               <div className="mb-2">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  End Time
+                  Deadline
                 </label>
                 <input
-                  type="text"
-                  name="end_time"
-                  value={userData.end_time}
-                  onChange={handleChange}
+                  type="date"
+                  name="deadline"
+                  value={userData.deadline}
+                  onChange={(e) =>
+                    setUserData({ ...userData, deadline: e.target.value })
+                  }
                   className="focus:outline-none shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                  placeholder="Enter a name"
                   required
                 />
               </div>
-              <div className="mb-2">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Progress
-                </label>
-                <input
-                  type="text"
-                  name="progress"
-                  value={userData.progress}
-                  onChange={handleChange}
-                  className="focus:outline-none shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                  placeholder="Enter a name"
-                  required
-                />
-              </div>
-              <div className="mb-2">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Materials
-                </label>
-                <input
-                  type="text"
-                  name="materials"
-                  value={userData.materials}
-                  onChange={handleChange}
-                  className="focus:outline-none shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                  placeholder="Enter a name"
-                  required
-                />
-              </div>
+
               <div className="mb-2">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Select User
@@ -169,7 +154,9 @@ function AddSession() {
                 <select
                   name="user_id"
                   value={userData.user_id}
-                  onChange={handleChange}
+                  onChange={(e) =>
+                    setUserData({ ...userData, user_id: e.target.value })
+                  }
                   className="focus:outline-none shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
                   required
                 >
@@ -181,9 +168,30 @@ function AddSession() {
                   ))}
                 </select>
               </div>
+              <div className="mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Select Group
+                </label>
+                <select
+                  name="group_id"
+                  value={userData.group_id}
+                  onChange={(e) =>
+                    setUserData({ ...userData, group_id: e.target.value })
+                  }
+                  className="focus:outline-none shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                  required
+                >
+                  <option value="">Select Group</option>
+                  {groups.map((group) => (
+                    <option key={group._id} value={group._id}>
+                      {group.group_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="my-4">
                 <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded-md">
-                  Add Session
+                  Add Task
                 </button>
               </div>
             </form>
@@ -195,4 +203,4 @@ function AddSession() {
   );
 }
 
-export default AddSession;
+export default AddTask;
